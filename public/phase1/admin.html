@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JyotishMiracle Admin Panel - Manage Remedies Database">
+    <title>Admin Panel - JyotishMiracle</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="admin-login" id="adminLogin">
+        <div class="admin-login__container">
+            <div class="admin-login__card">
+                <h1 class="admin-login__title">Admin Panel</h1>
+                <p class="admin-login__subtitle">JyotishMiracle.com</p>
+                
+                <form class="admin-login__form" id="loginForm">
+                    <div class="admin-login__form-group">
+                        <label for="adminUsername" class="admin-login__label">Username</label>
+                        <input type="text" id="adminUsername" class="admin-login__input" required autofocus>
+                    </div>
+                    
+                    <div class="admin-login__form-group">
+                        <label for="adminPassword" class="admin-login__label">Password</label>
+                        <input type="password" id="adminPassword" class="admin-login__input" required>
+                    </div>
+                    
+                    <button type="submit" class="admin-login__submit">Login</button>
+                    
+                    <div class="admin-login__links">
+                        <a href="#" class="admin-login__link" id="forgotPasswordLink">Forgot Password?</a>
+                        <a href="#" class="admin-login__link" id="changePasswordLink">Change Password</a>
+                    </div>
+                </form>
+                
+                <div class="admin-login__error" id="loginError" style="display: none;">
+                    <p id="loginErrorMessage"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="admin-modal" id="forgotPasswordModal">
+        <div class="admin-modal__overlay"></div>
+        <div class="admin-modal__content">
+            <button class="admin-modal__close" id="closeForgotModal">×</button>
+            <h2 class="admin-modal__title">Forgot Password</h2>
+            <form class="admin-modal__form" id="forgotPasswordForm">
+                <div class="admin-modal__form-group">
+                    <label for="forgotUsername" class="admin-modal__label">Username</label>
+                    <input type="text" id="forgotUsername" class="admin-modal__input" required>
+                </div>
+                <div class="admin-modal__form-group">
+                    <label for="forgotEmail" class="admin-modal__label">Email</label>
+                    <input type="email" id="forgotEmail" class="admin-modal__input" required>
+                </div>
+                <button type="submit" class="admin-modal__submit">Reset Password</button>
+            </form>
+            <div class="admin-modal__message" id="forgotPasswordMessage" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="admin-modal" id="changePasswordModal">
+        <div class="admin-modal__overlay"></div>
+        <div class="admin-modal__content">
+            <button class="admin-modal__close" id="closeChangeModal">×</button>
+            <h2 class="admin-modal__title">Change Password</h2>
+            <form class="admin-modal__form" id="changePasswordForm">
+                <div class="admin-modal__form-group">
+                    <label for="currentPassword" class="admin-modal__label">Current Password</label>
+                    <input type="password" id="currentPassword" class="admin-modal__input" required>
+                </div>
+                <div class="admin-modal__form-group">
+                    <label for="newPassword" class="admin-modal__label">New Password</label>
+                    <input type="password" id="newPassword" class="admin-modal__input" required>
+                </div>
+                <div class="admin-modal__form-group">
+                    <label for="confirmPassword" class="admin-modal__label">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" class="admin-modal__input" required>
+                </div>
+                <button type="submit" class="admin-modal__submit">Change Password</button>
+            </form>
+            <div class="admin-modal__message" id="changePasswordMessage" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard (Hidden by default) -->
+    <div class="admin-dashboard" id="adminDashboard" style="display: none;">
+        <!-- Header -->
+        <header class="admin-dashboard__header">
+            <div class="admin-dashboard__header-content">
+                <h1 class="admin-dashboard__logo">JyotishMiracle Admin</h1>
+                <div class="admin-dashboard__header-actions">
+                    <span class="admin-dashboard__user" id="adminUserDisplay"></span>
+                    <button class="admin-dashboard__logout" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="admin-dashboard__main">
+            <div class="admin-dashboard__container">
+                <!-- Dashboard Stats -->
+                <div class="admin-dashboard__stats">
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-card__icon">👥</div>
+                        <div class="admin-stat-card__content">
+                            <h3 class="admin-stat-card__value" id="totalCustomers">0</h3>
+                            <p class="admin-stat-card__label">Total Customers</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-card__icon">📋</div>
+                        <div class="admin-stat-card__content">
+                            <h3 class="admin-stat-card__value" id="totalRemedies">0</h3>
+                            <p class="admin-stat-card__label">Remedies Assigned</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Bar with Search -->
+                <div class="admin-dashboard__actions">
+                    <div class="admin-dashboard__search">
+                        <input 
+                            type="text" 
+                            id="searchCustomers" 
+                            class="admin-dashboard__search-input" 
+                            placeholder="Search by Customer ID or Name..."
+                        />
+                    </div>
+                    <button class="admin-btn admin-btn--primary" id="addCustomerBtn">
+                        + Add New Customer
+                    </button>
+                    <button class="admin-btn admin-btn--secondary" id="exportDataBtn">
+                        Export Data
+                    </button>
+                </div>
+
+                <!-- Customers Table -->
+                <div class="admin-dashboard__table-container">
+                    <h2 class="admin-dashboard__section-title">Remedy Database</h2>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table" id="customersTable">
+                            <thead>
+                                <tr>
+                                    <th>Customer ID</th>
+                                    <th>Name</th>
+                                    <th>DOB (MMDDYY)</th>
+                                    <th>Remedies</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody">
+                                <!-- Rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Customer Modal -->
+    <div class="admin-modal" id="customerModal">
+        <div class="admin-modal__overlay"></div>
+        <div class="admin-modal__content admin-modal__content--large">
+            <button class="admin-modal__close" id="closeCustomerModal">×</button>
+            <h2 class="admin-modal__title" id="customerModalTitle">Add New Customer</h2>
+            <form class="admin-modal__form" id="customerForm">
+                <input type="hidden" id="editCustomerId" value="">
+                
+                <div class="admin-modal__form-row">
+                    <div class="admin-modal__form-group">
+                        <label for="customerId" class="admin-modal__label">Customer ID *</label>
+                        <input type="text" id="customerId" class="admin-modal__input" required>
+                    </div>
+                    
+                    <div class="admin-modal__form-group">
+                        <label for="customerName" class="admin-modal__label">Customer Name *</label>
+                        <input type="text" id="customerName" class="admin-modal__input" required>
+                    </div>
+                </div>
+                
+                <div class="admin-modal__form-group">
+                    <label for="customerDob" class="admin-modal__label">Date of Birth (MMDDYY) *</label>
+                    <input type="text" id="customerDob" class="admin-modal__input" 
+                           placeholder="MMDDYY (e.g., 011590)" maxlength="6" required>
+                    <small class="admin-modal__hint">Format: MMDDYY (e.g., 011590 for January 15, 1990)</small>
+                </div>
+                
+                <div class="admin-modal__form-group">
+                    <label for="remedy1" class="admin-modal__label">Remedy 1</label>
+                    <textarea id="remedy1" class="admin-modal__textarea" rows="3"></textarea>
+                </div>
+                
+                <div class="admin-modal__form-group">
+                    <label for="remedy2" class="admin-modal__label">Remedy 2</label>
+                    <textarea id="remedy2" class="admin-modal__textarea" rows="3"></textarea>
+                </div>
+                
+                <div class="admin-modal__form-group">
+                    <label for="remedy3" class="admin-modal__label">Remedy 3</label>
+                    <textarea id="remedy3" class="admin-modal__textarea" rows="3"></textarea>
+                </div>
+                
+                <div class="admin-modal__form-group">
+                    <label for="remedy4" class="admin-modal__label">Remedy 4</label>
+                    <textarea id="remedy4" class="admin-modal__textarea" rows="3"></textarea>
+                </div>
+                
+                <div class="admin-modal__form-group">
+                    <label for="remedy5" class="admin-modal__label">Remedy 5</label>
+                    <textarea id="remedy5" class="admin-modal__textarea" rows="3"></textarea>
+                </div>
+                
+                <div class="admin-modal__actions">
+                    <button type="submit" class="admin-btn admin-btn--primary">Save Customer</button>
+                    <button type="button" class="admin-btn admin-btn--secondary" id="cancelCustomerBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="admin-modal" id="deleteModal">
+        <div class="admin-modal__overlay"></div>
+        <div class="admin-modal__content">
+            <button class="admin-modal__close" id="closeDeleteModal">×</button>
+            <h2 class="admin-modal__title">Confirm Delete</h2>
+            <p class="admin-modal__message">Are you sure you want to delete this customer? This action cannot be undone.</p>
+            <div class="admin-modal__actions">
+                <button class="admin-btn admin-btn--danger" id="confirmDeleteBtn">Delete</button>
+                <button class="admin-btn admin-btn--secondary" id="cancelDeleteBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts - ES6 Modules -->
+    <script type="module" src="js/admin-app.js"></script>
+</body>
+</html>
