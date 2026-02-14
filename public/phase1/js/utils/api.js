@@ -138,4 +138,4 @@ export async function deleteRemedy(id) {
     console.warn('deleteRemedy error:', err.message);
     throw err;
   }
-
+}
