@@ -1,9 +1,10 @@
 /**
  * Booking Form Component
- * Consultation form with validation
+ * Consultation form with validation — submits to MongoDB via API
  */
 
 import { sanitizeInput, validateConsultationForm } from '../../utils/validation.js';
+import { submitConsultation } from '../../utils/api.js';
 
 export class BookingForm {
     constructor() {
@@ -21,7 +22,7 @@ export class BookingForm {
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
     }
 
-    handleSubmit(e) {
+    async handleSubmit(e) {
         e.preventDefault();
         
         // Collect form data
@@ -44,29 +45,14 @@ export class BookingForm {
             return;
         }
 
-        // Log to console (for development)
-        console.log('Booking Form Submission:', formData);
-        
-        // TODO: Future API integration
-        // Example with EmailJS:
-        // emailjs.send('service_id', 'template_id', formData)
-        //     .then(() => this.showSuccess())
-        //     .catch(error => console.error('Error:', error));
-        
-        // Example with Telegram Bot:
-        // fetch('https://api.telegram.org/bot<TOKEN>/sendMessage', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({
-        //         chat_id: '<CHAT_ID>',
-        //         text: `New Consultation Request:\n\nName: ${formData.name}\nDOB: ${formData.dob}\n...`
-        //     })
-        // })
-        //     .then(() => this.showSuccess())
-        //     .catch(error => console.error('Error:', error));
-        
-        // Show success message
-        this.showSuccess();
+        // Submit to backend (MongoDB)
+        try {
+            await submitConsultation(formData);
+            this.showSuccess();
+        } catch (err) {
+            console.error('Consultation submit error:', err);
+            this.showErrors({ query: err.message || 'Failed to submit. Please try again.' });
+        }
     }
 
     showErrors(errors) {

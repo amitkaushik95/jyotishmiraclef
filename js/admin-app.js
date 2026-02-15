@@ -39,10 +39,9 @@ loginForm.addEventListener('submit', (e) => {
     const username = document.getElementById('adminUsername').value.trim();
     const password = document.getElementById('adminPassword').value;
     
-    // Try API login first
     (async () => {
         const res = await loginAdmin({ username, password });
-        if (res && res.token) {
+        if (res && res.success && res.token) {
             sessionStorage.setItem('admin_token', res.token);
             setAdminLoggedIn(true, username);
             sessionStorage.setItem('admin_username', username);
@@ -51,9 +50,10 @@ loginForm.addEventListener('submit', (e) => {
             return;
         }
 
-        // API login failed
         loginError.style.display = 'block';
-        loginErrorMessage.textContent = 'Invalid username or password';
+        loginErrorMessage.textContent = (res && res.error === 'network')
+            ? (res.message || 'Cannot reach server. Start the backend: cd backend && npm run dev')
+            : (res && res.message) || 'Invalid username or password';
     })();
 });
 
@@ -186,9 +186,7 @@ function hideDashboard() {
 // Customer Modal Functions (Global for onclick handlers)
 // ============================================
 window.editCustomer = function(customerId) {
-    // customerId here may be either the backend _id or the legacy customerId
     (async () => {
-        // Try to resolve from API first
         let customer = null;
         try {
             const list = await listRemedies(customerId);
@@ -198,7 +196,11 @@ window.editCustomer = function(customerId) {
         }
 
         if (!customer) {
-            customer = findCustomerById(customerId);
+            try {
+                customer = await findCustomerById(customerId);
+            } catch (e) {
+                // ignore
+            }
         }
 
         if (!customer) return;
@@ -221,9 +223,9 @@ window.editCustomer = function(customerId) {
     })();
 };
 
-window.confirmDeleteCustomer = function(customerId) {
-    // allow deleting via API id or customerId
-    deleteModal.dataset.customerId = customerId;
+window.confirmDeleteCustomer = function(customerId, docId) {
+    deleteModal.dataset.customerId = customerId || '';
+    deleteModal.dataset.id = docId || customerId || '';
     deleteModal.classList.add('admin-modal--active');
 };
 
@@ -332,10 +334,7 @@ customerForm.addEventListener('submit', (e) => {
 
             customerModal.classList.remove('admin-modal--active');
             customerForm.reset();
-            if (adminDashboardInstance) {
-                adminDashboardInstance.updateStats();
-                adminDashboardInstance.renderCustomersTable();
-            }
+            if (adminDashboardInstance) await adminDashboardInstance.loadAndRender();
         } catch (err) {
             console.error(err);
             alert('An error occurred while saving customer');
@@ -359,23 +358,19 @@ cancelDeleteBtn.addEventListener('click', () => {
 });
 
 confirmDeleteBtn.addEventListener('click', () => {
-    const customerId = deleteModal.dataset.customerId;
-    if (customerId) {
-        (async () => {
-            try {
-                await deleteRemedy(customerId);
-                alert('Customer deleted successfully!');
-            } catch (apiErr) {
-                console.error('Delete failed:', apiErr.message);
-                alert('Error deleting customer.');
-            }
+    const docId = deleteModal.dataset.id;
+    if (!docId) return;
+    (async () => {
+        try {
+            await deleteRemedy(docId);
+            alert('Customer deleted successfully!');
             deleteModal.classList.remove('admin-modal--active');
-            if (adminDashboardInstance) {
-                adminDashboardInstance.updateStats();
-                adminDashboardInstance.renderCustomersTable();
-            }
-        })();
-    }
+            if (adminDashboardInstance) await adminDashboardInstance.loadAndRender();
+        } catch (apiErr) {
+            console.error('Delete failed:', apiErr.message);
+            alert('Error deleting customer.');
+        }
+    })();
 });
 
 // ============================================

@@ -27,7 +27,7 @@ export class RemediesModal {
         myRemediesBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this.showLoginForm();
-            this.modal.classList.add('modal--active');
+            this.modal.classList.add('modal--open');
             document.body.style.overflow = 'hidden';
         });
 
@@ -72,6 +72,28 @@ export class RemediesModal {
         }
     }
 
+    /**
+     * Open the remedies modal programmatically. If a customerId is provided,
+     * populate the input and trigger the lookup.
+     */
+    async open(customerId) {
+        if (!this.modal) return;
+        this.showLoginForm();
+        this.modal.classList.add('modal--open');
+        document.body.style.overflow = 'hidden';
+
+        if (customerId) {
+            // Populate input and trigger lookup
+            const input = document.getElementById('customerIdInput');
+            if (input) input.value = String(customerId).trim();
+            try {
+                await this.handleLogin({ preventDefault: () => {} });
+            } catch (err) {
+                // handleLogin already logs errors; nothing additional needed here
+            }
+        }
+    }
+
     async handleLogin(e) {
         e.preventDefault();
         const customerId = document.getElementById('customerIdInput').value.trim();
@@ -95,7 +117,9 @@ export class RemediesModal {
         } catch (err) {
             console.error('Remedies lookup failed:', err.message);
             if (errorDiv) errorDiv.style.display = 'block';
-            if (errorMessage) errorMessage.textContent = 'Unable to reach the server. Please try again later.';
+            if (errorMessage) {
+                errorMessage.textContent = 'Unable to reach the server. Please try again. (Start backend: cd backend && npm run dev)';
+            }
         }
     }
 
@@ -107,13 +131,16 @@ export class RemediesModal {
             ? `${ageInfo.age} years (Born in ${ageInfo.year}${ageInfo.zodiacYear ? `, ${ageInfo.zodiacYear} Year` : ''})` 
             : 'N/A';
         
-        const remedies = [
-            customer.remedy1,
-            customer.remedy2,
-            customer.remedy3,
-            customer.remedy4,
-            customer.remedy5
-        ].filter(r => r && r.trim());
+        const remedies = (customer.remedies && customer.remedies.length
+            ? customer.remedies
+            : [
+                customer.remedy1,
+                customer.remedy2,
+                customer.remedy3,
+                customer.remedy4,
+                customer.remedy5
+            ]
+        ).filter(r => r && String(r).trim());
         
         this.modalBody.innerHTML = `
             <div class="remedies-dashboard remedies-dashboard--active">
@@ -152,7 +179,7 @@ export class RemediesModal {
 
     close() {
         if (this.modal) {
-            this.modal.classList.remove('modal--active');
+            this.modal.classList.remove('modal--open');
         }
         document.body.style.overflow = '';
     }

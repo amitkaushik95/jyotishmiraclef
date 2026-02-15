@@ -3,11 +3,10 @@
  * Enhanced admin panel with search functionality
  */
 
-import { 
-    getRemediesDatabase, 
-    addCustomer, 
-    updateCustomer, 
-    deleteCustomer, 
+import {
+    addCustomer,
+    updateCustomer,
+    deleteCustomer,
     searchCustomers,
     isAdminLoggedIn,
     setAdminLoggedIn
@@ -64,8 +63,8 @@ export class AdminDashboard {
                             const results = await listRemedies(query);
                             this.renderCustomersTable(results);
                         } catch (err) {
-                            const results = searchCustomers(query);
-                            this.renderCustomersTable(results);
+                            const results = await searchCustomers(query);
+                            this.renderCustomersTable(Array.isArray(results) ? results : []);
                         }
                     })();
                 } else {
@@ -99,7 +98,7 @@ export class AdminDashboard {
     }
 
     updateStats() {
-        const database = getRemediesDatabase();
+        const database = this.customers || [];
         const totalCustomers = database.length;
         const totalRemedies = database.reduce((count, customer) => {
             const remedies = customer.remedies || [
@@ -111,18 +110,18 @@ export class AdminDashboard {
             ].filter(r => r && r.trim());
             return count + remedies.length;
         }, 0);
-        
+
         const totalCustomersEl = document.getElementById('totalCustomers');
         const totalRemediesEl = document.getElementById('totalRemedies');
-        
+
         if (totalCustomersEl) totalCustomersEl.textContent = totalCustomers;
         if (totalRemediesEl) totalRemediesEl.textContent = totalRemedies;
     }
 
     renderCustomersTable(customers = null) {
         if (!this.customersTableBody) return;
-        
-        const database = customers || this.customers || getRemediesDatabase();
+
+        const database = customers ?? this.customers ?? [];
         
         if (database.length === 0) {
             this.customersTableBody.innerHTML = `
@@ -156,10 +155,10 @@ export class AdminDashboard {
                     </td>
                     <td>
                         <div class="admin-table__actions">
-                            <button class="admin-table__btn admin-table__btn--edit" onclick="window.adminDashboard.editCustomer('${customer.customerId}')">
+                            <button class="admin-table__btn admin-table__btn--edit" onclick="window.adminDashboard.editCustomer('${(customer.customerId || '').replace(/'/g, "\\'")}')">
                                 Edit
                             </button>
-                            <button class="admin-table__btn admin-table__btn--delete" onclick="window.adminDashboard.confirmDeleteCustomer('${customer.customerId}')">
+                            <button class="admin-table__btn admin-table__btn--delete" onclick="window.adminDashboard.confirmDeleteCustomer('${(customer.customerId || '').replace(/'/g, "\\'")}', '${(customer._id || '').toString().replace(/'/g, "\\'")}')">
                                 Delete
                             </button>
                         </div>
@@ -192,7 +191,7 @@ export class AdminDashboard {
     }
 
     exportData() {
-        const database = this.customers && this.customers.length ? this.customers : getRemediesDatabase();
+        const database = this.customers || [];
         const dataStr = JSON.stringify(database, null, 2);
         const dataBlob = new Blob([dataStr], { type: 'application/json' });
         const url = URL.createObjectURL(dataBlob);

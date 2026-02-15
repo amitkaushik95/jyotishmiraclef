@@ -399,3 +399,199 @@ body {
     font-size: 0.85rem;
     font-weight: 600;
 }
+
+/* ============================================
+   Admin Modal Styles
+   ============================================ */
+.admin-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+}
+
+.admin-modal--active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.admin-modal__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+}
+
+.admin-modal__content {
+    position: relative;
+    background: var(--color-white);
+    border-radius: 15px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    padding: 40px;
+}
+
+.admin-modal__content--large {
+    max-width: 700px;
+}
+
+.admin-modal__close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--color-light-gray);
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-modal__close:hover {
+    background: var(--color-imperial-red);
+    color: var(--color-white);
+}
+
+.admin-modal__title {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    color: var(--color-dark);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.admin-modal__message {
+    font-size: 1rem;
+    color: var(--color-text);
+    margin-bottom: 30px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.admin-modal__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.admin-modal__form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.admin-modal__form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.admin-modal__label {
+    font-weight: 600;
+    color: var(--color-dark);
+    font-size: 0.95rem;
+}
+
+.admin-modal__input {
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.admin-modal__input:focus {
+    outline: none;
+    border-color: var(--color-golden);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.admin-modal__textarea {
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    resize: vertical;
+    transition: var(--transition);
+}
+
+.admin-modal__textarea:focus {
+    outline: none;
+    border-color: var(--color-golden);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.admin-modal__hint {
+    font-size: 0.85rem;
+    color: var(--color-gray);
+    margin-top: 4px;
+}
+
+.admin-modal__actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+    justify-content: center;
+}
+
+.admin-modal__submit {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--color-imperial-red), var(--color-astro-orange));
+    color: var(--color-white);
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.admin-modal__submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(196, 30, 58, 0.3);
+}
+
+.admin-modal__message {
+    padding: 16px;
+    background: #efe;
+    border: 1px solid var(--color-success);
+    border-radius: 8px;
+    color: var(--color-success);
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Responsive: modal content */
+@media (max-width: 600px) {
+    .admin-modal__content {
+        padding: 30px 20px;
+    }
+
+    .admin-modal__form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-modal__actions {
+        flex-direction: column;
+    }
+
+    .admin-btn {
+        width: 100%;
+    }
+}

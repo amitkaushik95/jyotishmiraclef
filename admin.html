@@ -13,6 +13,11 @@
     
     <!-- Stylesheet -->
     <link rel="stylesheet" href="admin.css">
+
+    <!-- API base URL: set before app loads (e.g. when using a separate dev server) -->
+    <script>
+      window.JYOTISH_API_BASE = window.JYOTISH_API_BASE || 'http://localhost:5000';
+    </script>
 </head>
 <body>
     <!-- Login Screen -->
